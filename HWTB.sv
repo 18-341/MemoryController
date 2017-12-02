@@ -154,12 +154,18 @@ module HWTB (
           we_out = 1'b1;
 
           inc_tick_count[0] = 1'b1;
+
           next_state = PHASE0_RD;
         end
       end
 
       PHASE0_RD: begin
-        if (tick_count[0] == 32'hff_ff_ff_ff) begin
+        if (issued_count == 1 && phase_ready) begin
+          clr_issued_count = 1'b1;
+          clr_tick_count = 1'b1;
+          clr_correct_count = 1'b1;
+          next_state = ERROR;
+        end else if (tick_count[0] == 32'hff_ff_ff_ff) begin
           clr_issued_count = 1'b1;
           clr_tick_count = 1'b1;
           clr_correct_count = 1'b1;
@@ -179,7 +185,7 @@ module HWTB (
 
             phase1_start = 1'b1;
 
-            clr_correct_count = 1'b1;
+            clr_issued_count = 1'b1;
             next_state = PHASE1_WR;
           end
         end
